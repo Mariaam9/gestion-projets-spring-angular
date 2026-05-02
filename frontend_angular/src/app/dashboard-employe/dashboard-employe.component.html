@@ -1,0 +1,243 @@
+<div class="employee-layout" [class.sidebar-collapsed]="isSidebarCollapsed">
+  <aside class="sidebar">
+    <div class="brand-block">
+      <button class="brand-trigger" type="button" (click)="toggleSidebar()" [attr.aria-expanded]="!isSidebarCollapsed" aria-label="Afficher ou masquer le menu employé">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="6" width="16" height="13" rx="2.4" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 6V4.6C8 3.7 8.7 3 9.6 3h4.8c.9 0 1.6.7 1.6 1.6V6" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 11h3v4H8v-4Zm5 2h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="brand-text" *ngIf="!isSidebarCollapsed">
+          <strong>GestionPro</strong>
+          <span>Employé</span>
+        </span>
+      </button>
+
+      <button class="sidebar-toggle" type="button" *ngIf="!isSidebarCollapsed" (click)="toggleSidebar()" aria-label="Réduire le menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Navigation employé">
+      <a class="nav-item active" routerLink="/dashboard-employe">
+        <svg viewBox="0 0 24 24" width="21" height="21" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-9.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        <span *ngIf="!isSidebarCollapsed">Mes Projets</span>
+      </a>
+    </nav>
+
+    <button class="logout-button" type="button" (click)="logout()">
+      <svg viewBox="0 0 24 24" width="21" height="21" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 6H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+        <path d="M14 8l4 4-4 4M18 12H9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span *ngIf="!isSidebarCollapsed">Déconnexion</span>
+    </button>
+  </aside>
+
+  <main class="main-zone">
+    <header class="topbar">
+      <div class="page-title">
+        <h1>Mes Projets</h1>
+        <p>Consultez vos projets et collaborateurs</p>
+      </div>
+
+      <div class="topbar-right">
+        <div class="profile-menu-wrapper">
+          <button class="profile-trigger" type="button" (click)="toggleProfileMenu()" [class.open]="isProfileMenuOpen" aria-label="Ouvrir le menu employé">
+            <span class="user-summary">
+              <strong>{{ getUserFullName() }}</strong>
+              <span>{{ getUserEmail() }}</span>
+            </span>
+
+            <span class="user-avatar" aria-hidden="true">
+              {{ getCurrentUserInitials() }}
+            </span>
+          </button>
+
+          <div class="profile-dropdown" *ngIf="isProfileMenuOpen">
+            <div class="profile-header">
+              <span class="dropdown-avatar">{{ getCurrentUserInitials() }}</span>
+              <span>
+                <strong>{{ getUserFullName() }}</strong>
+                <small>{{ getUserEmail() }}</small>
+              </span>
+            </div>
+            <button class="dropdown-item logout" type="button" (click)="logout()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M15 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M21 19V5a2 2 0 0 0-2-2h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Déconnexion
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="message-card error" *ngIf="error">
+        <strong>Erreur</strong>
+        <p>{{ error }}</p>
+        <button type="button" (click)="loadMesProjets()">Réessayer</button>
+      </div>
+
+      <div class="stats-grid" *ngIf="!error">
+        <article class="stat-card">
+          <div class="stat-icon blue">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="6" width="16" height="13" rx="2.4" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M8 6V4.8C8 3.8 8.8 3 9.8 3h4.4c1 0 1.8.8 1.8 1.8V6" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M8 11h3v4H8v-4Zm5 2h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <p>Projets actifs</p>
+            <h3>{{ stats.projetsActifs }}</h3>
+          </div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon cyan">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M3.8 20c.55-3.5 2.25-5.25 5.2-5.25 2.95 0 4.65 1.75 5.2 5.25" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <circle cx="17" cy="9" r="2.4" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M15.8 15.2c2.45.4 3.9 2 4.4 4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <p>Collaborateurs</p>
+            <h3>{{ stats.collaborateurs }}</h3>
+          </div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon purple">
+            <svg viewBox="0 0 24 24" width="31" height="31" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 12h4l2.2-6 4 13 2.2-7H21" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <p>Progression moyenne</p>
+            <h3>{{ stats.progressionMoyenne }}%</h3>
+          </div>
+        </article>
+      </div>
+
+      <div class="loading-card" *ngIf="loading && !error">
+        <div class="spinner"></div>
+        <span>Chargement des données depuis la base de données...</span>
+      </div>
+
+      <div class="empty-card" *ngIf="!loading && !error && projets.length === 0">
+        <div class="empty-icon">📁</div>
+        <h2>Aucun projet affecté</h2>
+        <p>Vos projets apparaîtront ici dès qu’un administrateur vous affecte à un projet.</p>
+      </div>
+
+      <section class="projects-list" *ngIf="!loading && !error && projets.length > 0">
+        <article class="project-card" *ngFor="let project of projets; trackBy: trackByProjetId">
+          <div class="project-header">
+            <div class="project-icon" [ngClass]="project.accentClass">
+              <svg viewBox="0 0 24 24" width="27" height="27" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="6" width="16" height="13" rx="2.4" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M8 6V4.8C8 3.8 8.8 3 9.8 3h4.4c1 0 1.8.8 1.8 1.8V6" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M8 11h3v4H8v-4Zm5 2h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+
+            <div class="project-title-block">
+              <div class="title-row">
+                <h2>{{ project.nom }}</h2>
+                <span class="status-pill" [ngClass]="project.statutClass">{{ project.statut }}</span>
+              </div>
+              <p>{{ project.description }}</p>
+            </div>
+          </div>
+
+          <div class="dates-row">
+            <div class="date-item">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              <strong>Début:</strong>
+              <span>{{ project.dateDebut ? (project.dateDebut | date:'yyyy-MM-dd') : 'Non définie' }}</span>
+            </div>
+
+            <div class="date-item">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <strong>Fin prévue:</strong>
+              <span>{{ project.dateFin ? (project.dateFin | date:'yyyy-MM-dd') : 'Non définie' }}</span>
+            </div>
+          </div>
+
+          <div class="progress-block">
+            <div class="progress-label">
+              <span>Progression</span>
+              <strong>{{ project.progression }}%</strong>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" [ngClass]="project.accentClass" [style.width.%]="project.progression"></div>
+            </div>
+          </div>
+
+          <div class="project-footer">
+            <div class="members-summary">
+              <div class="members-count">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.7"/>
+                  <path d="M4 20c.6-3.4 2.25-5.1 5-5.1s4.4 1.7 5 5.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                  <path d="M16 11.1c1.55.35 2.55 1.55 3 3.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                  <path d="M15.5 5.3A2.6 2.6 0 0 1 18 8a2.6 2.6 0 0 1-1.5 2.35" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+                <span>{{ project.collaborateurs.length }} membres</span>
+              </div>
+
+              <div class="avatar-stack" *ngIf="project.collaborateurs.length > 0">
+                <span class="mini-avatar" *ngFor="let collaborateur of project.collaborateurs.slice(0, 3)">
+                  {{ collaborateur.initials }}
+                </span>
+                <span class="mini-avatar more" *ngIf="project.collaborateurs.length > 3">
+                  +{{ project.collaborateurs.length - 3 }}
+                </span>
+              </div>
+            </div>
+
+            <button class="expand-button" type="button" (click)="toggleProject(project)" [class.open]="project.expanded" aria-label="Afficher les collaborateurs">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="collaborators-panel" *ngIf="project.expanded">
+            <div class="collaborators-title">Collaborateurs du projet</div>
+            <div class="collaborator-row" *ngFor="let collaborateur of project.collaborateurs">
+              <span class="collaborator-avatar">{{ collaborateur.initials }}</span>
+              <div>
+                <strong>{{ collaborateur.nomComplet }}</strong>
+                <p>
+                  Affecté du
+                  {{ collaborateur.dateDebut ? (collaborateur.dateDebut | date:'dd/MM/yyyy') : '—' }}
+                  au
+                  {{ collaborateur.dateFin ? (collaborateur.dateFin | date:'dd/MM/yyyy') : 'présent' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </section>
+  </main>
+</div>

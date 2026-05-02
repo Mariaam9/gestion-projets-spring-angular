@@ -1,0 +1,152 @@
+<div class="admin-layout" [class.sidebar-collapsed]="isCollapsed">
+  <aside class="admin-sidebar">
+    <div class="brand-zone">
+      <button class="brand-trigger" type="button" (click)="toggleSidebar()" [attr.aria-expanded]="!isCollapsed" aria-label="Afficher ou masquer le menu administrateur">
+        <span class="brand-icon" aria-hidden="true">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
+            <rect x="4" y="4" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="2"/>
+            <rect x="14" y="4" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="2"/>
+            <rect x="4" y="14" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="2"/>
+            <rect x="14" y="14" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+
+        <span class="brand-text" *ngIf="!isCollapsed">
+          <strong>GestionPro</strong>
+          <span>Admin</span>
+        </span>
+      </button>
+
+      <button class="sidebar-toggle" type="button" *ngIf="!isCollapsed" (click)="toggleSidebar()" aria-label="Réduire le menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item">
+        <span class="nav-icon">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+            <rect x="4" y="4" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="2"/>
+            <rect x="14" y="4" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="2"/>
+            <rect x="4" y="14" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="2"/>
+            <rect x="14" y="14" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+        <span *ngIf="!isCollapsed">Dashboard</span>
+        <span class="nav-arrow" *ngIf="!isCollapsed">›</span>
+      </a>
+
+      <a routerLink="/members" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="9.5" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span *ngIf="!isCollapsed">Employés</span>
+      </a>
+
+      <a routerLink="/categories" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+            <path d="M9 3H5a2 2 0 0 0-2 2v4h6V3Zm12 6V5a2 2 0 0 0-2-2h-4v6h6ZM9 15H3v4a2 2 0 0 0 2 2h4v-6Zm12 0h-6v6h4a2 2 0 0 0 2-2v-4Z" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+        </span>
+        <span *ngIf="!isCollapsed">Catégories</span>
+      </a>
+
+      <a routerLink="/projets" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+            <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2h7.5A2.5 2.5 0 0 1 21 9.5v7A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M7 10.5h2v4H7v-4Zm4 2h2v2h-2v-2Zm4-3h2v5h-2v-5Z" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </span>
+        <span *ngIf="!isCollapsed">Projets</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="footer-link logout" type="button" (click)="logout()">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M15 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M21 19V5a2 2 0 0 0-2-2h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span *ngIf="!isCollapsed">Déconnexion</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <header class="topbar">
+      <div class="page-title">
+        <h1>{{ currentPageTitle }}</h1>
+        <p>{{ currentPageSubtitle }}</p>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="profile-menu-wrapper">
+          <button class="profile-trigger" type="button" (click)="toggleProfileMenu()" [class.open]="isProfileMenuOpen" aria-label="Ouvrir le menu administrateur">
+            <span class="user-block">
+              <strong>{{ getUserName() }}</strong>
+              <small>{{ getUserEmail() }}</small>
+            </span>
+
+            <span class="avatar" aria-hidden="true">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+                <path d="M4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </button>
+
+          <div class="profile-dropdown" *ngIf="isProfileMenuOpen">
+            <div class="profile-header">
+              <span class="dropdown-avatar" aria-hidden="true">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+                  <path d="M4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span>
+                <strong>{{ getUserName() }}</strong>
+                <small>{{ getUserEmail() }}</small>
+              </span>
+            </div>
+
+            <button class="dropdown-item" type="button">
+              <span class="dropdown-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+                  <path d="M4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </span>
+              Profil admin
+            </button>
+
+            <button class="dropdown-item logout" type="button" (click)="logout()">
+              <span class="dropdown-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M15 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M21 19V5a2 2 0 0 0-2-2h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </span>
+              Déconnexion
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="content-area">
+      <ng-content></ng-content>
+    </section>
+  </main>
+</div>

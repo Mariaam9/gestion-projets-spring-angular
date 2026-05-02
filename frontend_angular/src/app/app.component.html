@@ -1,0 +1,9 @@
+<ng-container *ngIf="isLoginPage || isEmployeeDashboardPage; else authenticatedLayout">
+  <router-outlet></router-outlet>
+</ng-container>
+
+<ng-template #authenticatedLayout>
+  <app-template>
+    <router-outlet></router-outlet>
+  </app-template>
+</ng-template>

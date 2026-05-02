@@ -1,0 +1,8 @@
+.redirect-card {
+  background: #ffffff;
+  border: 1px solid #dbe5f2;
+  border-radius: 14px;
+  padding: 22px;
+  color: #48648a;
+  box-shadow: 0 2px 7px rgba(15, 23, 42, 0.08);
+}

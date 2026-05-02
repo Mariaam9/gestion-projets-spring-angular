@@ -1,0 +1,212 @@
+<div class="projet-page">
+
+  <nav class="page-breadcrumb" aria-label="Fil d’Ariane">
+    <a routerLink="/dashboard">Dashboard</a>
+    <span class="separator">/</span>
+    <span>Projets</span>
+  </nav>
+
+  <div class="toolbar-row">
+    <div class="projects-count" *ngIf="!loading">
+      {{ projets.length }} projet{{ projets.length > 1 ? 's' : '' }} au total
+    </div>
+
+    <button class="add-project-btn" type="button" (click)="goToCreateProjet()" title="Ajouter un projet">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <div class="search-card">
+    <div class="search-wrapper">
+      <svg class="search-icon" width="19" height="19" viewBox="0 0 24 24" fill="none">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"></circle>
+        <path d="M20 20L16.2 16.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+      </svg>
+      <input type="text" placeholder="Rechercher un projet..." [(ngModel)]="searchText" />
+    </div>
+  </div>
+
+  <div class="loading-card" *ngIf="loading">
+    Chargement des projets...
+  </div>
+
+  <div class="projects-grid" *ngIf="!loading">
+    <article class="project-card" *ngFor="let projet of filteredProjets; trackBy: trackById">
+      <div class="project-top">
+        <div class="project-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M4 7.5C4 6.12 5.12 5 6.5 5H10L12 7H17.5C18.88 7 20 8.12 20 9.5V17.5C20 18.88 18.88 20 17.5 20H6.5C5.12 20 4 18.88 4 17.5V7.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path>
+            <path d="M8 11V16M12 13V16M16 10V16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+          </svg>
+        </div>
+
+        <div class="project-main">
+          <h3>{{ projet.nom }}</h3>
+          <span class="status-badge" [ngClass]="getProjectStatusClass(projet)">
+            {{ getProjectStatusLabel(projet) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="project-meta">
+        <div class="meta-line">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M7 3V6M17 3V6M4 9H20M6 5H18C19.1 5 20 5.9 20 7V19C20 20.1 19.1 21 18 21H6C4.9 21 4 20.1 4 19V7C4 5.9 4.9 5 6 5Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <span>{{ formatDateRange(projet) }}</span>
+        </div>
+
+        <div class="meta-line">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M16 19C16 16.79 14.21 15 12 15H7C4.79 15 3 16.79 3 19M14 5.34C14.59 5.12 15.23 5 15.9 5C18.16 5 20 6.84 20 9.1C20 11.36 18.16 13.2 15.9 13.2M12 8.5C12 10.43 10.43 12 8.5 12C6.57 12 5 10.43 5 8.5C5 6.57 6.57 5 8.5 5C10.43 5 12 6.57 12 8.5Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+          </svg>
+          <span>{{ getProjectEmployees(projet).length }} {{ pluralEmploye(getProjectEmployees(projet).length) }}</span>
+        </div>
+      </div>
+
+      <div class="employee-chips" *ngIf="getProjectEmployees(projet).length > 0">
+        <span class="employee-chip" *ngFor="let employe of getProjectEmployees(projet).slice(0, 4); trackBy: trackById">
+          <span class="chip-avatar">{{ getInitials(employe) }}</span>
+          {{ getEmployeFullName(employe) }}
+        </span>
+        <span class="employee-chip more-chip" *ngIf="getProjectEmployees(projet).length > 4">
+          +{{ getProjectEmployees(projet).length - 4 }}
+        </span>
+      </div>
+
+      <div class="no-employees" *ngIf="getProjectEmployees(projet).length === 0">
+        Aucun employé affecté
+      </div>
+
+      <div class="project-actions">
+        <button class="manage-btn" type="button" (click)="openAssignmentModal(projet)" title="Gérer les employés affectés">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+            <path d="M12 15.5C13.93 15.5 15.5 13.93 15.5 12C15.5 10.07 13.93 8.5 12 8.5C10.07 8.5 8.5 10.07 8.5 12C8.5 13.93 10.07 15.5 12 15.5Z" stroke="currentColor" stroke-width="1.8"></path>
+            <path d="M19.4 15A1.65 1.65 0 0 0 19.73 16.82L19.79 16.88A2 2 0 1 1 16.96 19.71L16.9 19.65A1.65 1.65 0 0 0 15.08 19.32A1.65 1.65 0 0 0 14.08 20.83V21A2 2 0 0 1 10.08 21V20.91A1.65 1.65 0 0 0 9 19.4A1.65 1.65 0 0 0 7.18 19.73L7.12 19.79A2 2 0 1 1 4.29 16.96L4.35 16.9A1.65 1.65 0 0 0 4.68 15.08A1.65 1.65 0 0 0 3.17 14.08H3A2 2 0 0 1 3 10.08H3.09A1.65 1.65 0 0 0 4.6 9A1.65 1.65 0 0 0 4.27 7.18L4.21 7.12A2 2 0 1 1 7.04 4.29L7.1 4.35A1.65 1.65 0 0 0 8.92 4.68H9A1.65 1.65 0 0 0 9.92 3.17V3A2 2 0 1 1 13.92 3V3.09A1.65 1.65 0 0 0 15 4.6A1.65 1.65 0 0 0 16.82 4.27L16.88 4.21A2 2 0 1 1 19.71 7.04L19.65 7.1A1.65 1.65 0 0 0 19.32 8.92V9A1.65 1.65 0 0 0 20.83 9.92H21A2 2 0 0 1 21 13.92H20.91A1.65 1.65 0 0 0 19.4 15Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+
+        <button class="project-action-btn edit" type="button" (click)="editProjet(projet)" title="Modifier le projet">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M4 20H8L18.5 9.5C19.6 8.4 19.6 6.6 18.5 5.5C17.4 4.4 15.6 4.4 14.5 5.5L4 16V20Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+            <path d="M13.5 6.5L17.5 10.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+          </svg>
+        </button>
+
+        <button class="project-action-btn delete" type="button" (click)="deleteProjet(projet)" title="Supprimer le projet">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M4 7H20M10 11V17M14 11V17M6 7L7 21H17L18 7M9 7V4H15V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+      </div>
+    </article>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && filteredProjets.length === 0">
+    Aucun projet trouvé.
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showAssignmentModal" (click)="closeAssignmentModal()">
+  <section class="assignment-modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div class="modal-title-block">
+        <div class="modal-project-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M4 7.5C4 6.12 5.12 5 6.5 5H10L12 7H17.5C18.88 7 20 8.12 20 9.5V17.5C20 18.88 18.88 20 17.5 20H6.5C5.12 20 4 18.88 4 17.5V7.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path>
+            <path d="M8 11V16M12 13V16M16 10V16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <div>
+          <h2>{{ selectedProjet?.nom }}</h2>
+          <p>Ajouter ou retirer des employés</p>
+        </div>
+      </div>
+      <button class="modal-close" type="button" (click)="closeAssignmentModal()" aria-label="Fermer">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </header>
+
+    <div class="modal-body">
+      <div class="modal-alert" *ngIf="modalError">
+        {{ modalError }}
+      </div>
+
+      <div class="assignment-columns">
+        <div class="assignment-column">
+          <h3>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M16 19C16 16.79 14.21 15 12 15H7C4.79 15 3 16.79 3 19M20.5 19C20.5 17.35 19.5 15.93 18.07 15.32M15.5 5.29C16.05 5.1 16.64 5 17.25 5C19.04 5 20.5 6.46 20.5 8.25C20.5 10.04 19.04 11.5 17.25 11.5C16.64 11.5 16.05 11.4 15.5 11.21M12 8.5C12 10.43 10.43 12 8.5 12C6.57 12 5 10.43 5 8.5C5 6.57 6.57 5 8.5 5C10.43 5 12 6.57 12 8.5Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+            </svg>
+            Employés affectés ({{ getAffectedEmployees().length }})
+          </h3>
+
+          <div class="employee-list affected-list">
+            <div class="person-row affected" *ngFor="let employe of getAffectedEmployees(); trackBy: trackById">
+              <div class="person-avatar blue">{{ getInitials(employe) }}</div>
+              <div class="person-info">
+                <strong>{{ getEmployeFullName(employe) }}</strong>
+                <span>{{ getEmployeCategory(employe) }}</span>
+              </div>
+              <button class="person-action remove" type="button" (click)="removeEmployeeFromProject(employe)" title="Retirer du projet">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M16 21V19C16 16.79 14.21 15 12 15H7C4.79 15 3 16.79 3 19V21M8.5 11C10.43 11 12 9.43 12 7.5C12 5.57 10.43 4 8.5 4C6.57 4 5 5.57 5 7.5C5 9.43 6.57 11 8.5 11ZM18 8V14M21 11H15" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div class="empty-list" *ngIf="getAffectedEmployees().length === 0">
+              Aucun employé affecté à ce projet.
+            </div>
+          </div>
+        </div>
+
+        <div class="assignment-column">
+          <h3>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M16 19C16 16.79 14.21 15 12 15H7C4.79 15 3 16.79 3 19M20.5 19C20.5 17.35 19.5 15.93 18.07 15.32M15.5 5.29C16.05 5.1 16.64 5 17.25 5C19.04 5 20.5 6.46 20.5 8.25C20.5 10.04 19.04 11.5 17.25 11.5C16.64 11.5 16.05 11.4 15.5 11.21M12 8.5C12 10.43 10.43 12 8.5 12C6.57 12 5 10.43 5 8.5C5 6.57 6.57 5 8.5 5C10.43 5 12 6.57 12 8.5Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+            </svg>
+            Disponibles ({{ getAvailableEmployees().length }})
+          </h3>
+
+          <div class="employee-list available-list">
+            <div class="person-row available" *ngFor="let employe of getAvailableEmployees(); trackBy: trackById">
+              <div class="person-avatar gray">{{ getInitials(employe) }}</div>
+              <div class="person-info">
+                <strong>{{ getEmployeFullName(employe) }}</strong>
+                <span>{{ getEmployeCategory(employe) }}</span>
+              </div>
+              <button class="person-action add" type="button" (click)="addEmployeeToProject(employe)" title="Ajouter au projet">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M16 21V19C16 16.79 14.21 15 12 15H7C4.79 15 3 16.79 3 19V21M8.5 11C10.43 11 12 9.43 12 7.5C12 5.57 10.43 4 8.5 4C6.57 4 5 5.57 5 7.5C5 9.43 6.57 11 8.5 11ZM18 8V14M21 11H15" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div class="empty-list" *ngIf="getAvailableEmployees().length === 0">
+              Tous les employés sont déjà affectés.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="modal-footer">
+      <button class="save-btn" type="button" (click)="saveAssignments()" [disabled]="savingAssignments">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+          <path d="M19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H16L21 8V19C21 20.1 20.1 21 19 21Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+          <path d="M7 3V9H15M7 21V14H17V21" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+        </svg>
+        {{ savingAssignments ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
+    </footer>
+  </section>
+</div>
