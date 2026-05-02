@@ -1,0 +1,21 @@
+# Angular
+frontend_angular/node_modules/
+frontend_angular/dist/
+frontend_angular/.angular/
+
+# Spring Boot
+backend_springmvc/target/
+*.class
+*.jar
+*.war
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
