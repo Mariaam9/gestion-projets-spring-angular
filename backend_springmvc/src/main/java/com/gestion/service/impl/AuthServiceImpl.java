@@ -53,4 +53,13 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole(), user.getId());
         return new AuthResponse(token, user.getRole(), user.getNom(), user.getPrenom(), user.getId());
     }
+
+    @Override
+    public void logout(String authHeader) {
+        // JWT est stateless : le backend ne garde pas de session a detruire.
+        // La deconnexion reelle consiste a supprimer le token cote frontend.
+        // Cette methode garde un endpoint /api/auth/logout disponible et extensible
+        // si on ajoute plus tard une liste noire de tokens.
+    }
+
 }

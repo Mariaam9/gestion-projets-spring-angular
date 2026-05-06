@@ -10,6 +10,7 @@ public class AffectationDTO {
     private LocalDate dateFin;
     private String employeNom;
     private String employePrenom;
+    private String employeEmail;
     private String projetNom;
 
     public AffectationDTO() {}
@@ -34,6 +35,9 @@ public class AffectationDTO {
 
     public String getEmployePrenom() { return employePrenom; }
     public void setEmployePrenom(String employePrenom) { this.employePrenom = employePrenom; }
+
+    public String getEmployeEmail() { return employeEmail; }
+    public void setEmployeEmail(String employeEmail) { this.employeEmail = employeEmail; }
 
     public String getProjetNom() { return projetNom; }
     public void setProjetNom(String projetNom) { this.projetNom = projetNom; }

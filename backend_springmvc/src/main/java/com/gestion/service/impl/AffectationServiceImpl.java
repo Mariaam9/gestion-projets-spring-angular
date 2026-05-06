@@ -81,6 +81,7 @@ public class AffectationServiceImpl implements AffectationService {
         dto.setDateFin(a.getDateFin());
         dto.setEmployeNom(a.getEmploye().getNom());
         dto.setEmployePrenom(a.getEmploye().getPrenom());
+        dto.setEmployeEmail(a.getEmploye().getEmail());
         dto.setProjetNom(a.getProjet().getNom());
         return dto;
     }

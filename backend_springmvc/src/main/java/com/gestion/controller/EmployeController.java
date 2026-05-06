@@ -1,95 +1,60 @@
 package com.gestion.controller;
 
-import com.gestion.config.JwtUtil;
-import com.gestion.dto.AffectationDTO;
+import com.gestion.dto.EmployeDTO;
 import com.gestion.dto.EmployeResponseDTO;
-import com.gestion.dto.ProjetDTO;
-import com.gestion.entity.Employe;
-import com.gestion.entity.Projet;
-import com.gestion.service.AffectationService;
+import com.gestion.mapper.EmployeMapper;
 import com.gestion.service.EmployeService;
-import com.gestion.service.ProjetService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/employe")
+@RequestMapping("/api/admin/employes")
+@PreAuthorize("hasRole('ADMIN')")
 public class EmployeController {
 
-    private final ProjetService projetService;
-    private final AffectationService affectationService;
     private final EmployeService employeService;
-    private final JwtUtil jwtUtil;
 
-    public EmployeController(ProjetService projetService,
-                             AffectationService affectationService,
-                             EmployeService employeService,
-                             JwtUtil jwtUtil) {
-        this.projetService = projetService;
-        this.affectationService = affectationService;
+    public EmployeController(EmployeService employeService) {
         this.employeService = employeService;
-        this.jwtUtil = jwtUtil;
     }
 
-    @GetMapping("/projets")
-    public ResponseEntity<List<ProjetDTO>> getAllProjets() {
+    @GetMapping
+    public ResponseEntity<List<EmployeResponseDTO>> getAllEmployes() {
         return ResponseEntity.ok(
-                projetService.findAll().stream()
-                        .map(this::toProjetDTO)
-                        .collect(Collectors.toList())
+                employeService.findAll().stream()
+                        .map(EmployeMapper::toResponseDTO)
+                        .toList()
         );
     }
 
-    @GetMapping("/projets/{projetId}/employes")
-    public ResponseEntity<List<AffectationDTO>> getEmployesByProjet(@PathVariable Long projetId) {
-        return ResponseEntity.ok(affectationService.findByProjet(projetId));
+    @GetMapping("/{id}")
+    public ResponseEntity<EmployeResponseDTO> getEmploye(@PathVariable Long id) {
+        return ResponseEntity.ok(EmployeMapper.toResponseDTO(employeService.findById(id)));
     }
 
-    @GetMapping("/mes-projets")
-    public ResponseEntity<List<AffectationDTO>> mesAffectations(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7);
-        Long userId = jwtUtil.extractUserId(token);
-        return ResponseEntity.ok(affectationService.findByEmploye(userId));
+    @PostMapping
+    public ResponseEntity<EmployeResponseDTO> createEmploye(@RequestBody EmployeDTO dto) {
+        return ResponseEntity.ok(EmployeMapper.toResponseDTO(employeService.create(dto)));
     }
 
-    @GetMapping("/profil")
-    public ResponseEntity<EmployeResponseDTO> getProfil(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7);
-        Long userId = jwtUtil.extractUserId(token);
-        return ResponseEntity.ok(toEmployeResponseDTO(employeService.findById(userId)));
+    @PutMapping("/{id}")
+    public ResponseEntity<EmployeResponseDTO> updateEmploye(@PathVariable Long id, @RequestBody EmployeDTO dto) {
+        return ResponseEntity.ok(EmployeMapper.toResponseDTO(employeService.update(id, dto)));
     }
 
-    private EmployeResponseDTO toEmployeResponseDTO(Employe employe) {
-        EmployeResponseDTO dto = new EmployeResponseDTO();
-        dto.setId(employe.getId());
-        dto.setNom(employe.getNom());
-        dto.setPrenom(employe.getPrenom());
-        dto.setEmail(employe.getEmail());
-        dto.setRole(employe.getRole());
-        dto.setMatricule(employe.getMatricule());
-
-        if (employe.getCategorie() != null) {
-            dto.setCategorieId(employe.getCategorie().getId());
-            dto.setCategorieNom(employe.getCategorie().getNom());
-        }
-
-        return dto;
-    }
-
-    private ProjetDTO toProjetDTO(Projet projet) {
-        return new ProjetDTO(
-                projet.getId(),
-                projet.getNom(),
-                projet.getDescription(),
-                projet.getDateDebut(),
-                projet.getDateFin()
-        );
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEmploye(@PathVariable Long id) {
+        employeService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

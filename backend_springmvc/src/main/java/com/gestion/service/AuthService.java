@@ -5,4 +5,5 @@ import com.gestion.dto.AuthResponse;
 
 public interface AuthService {
     AuthResponse login(AuthRequest request);
+    void logout(String authHeader);
 }
