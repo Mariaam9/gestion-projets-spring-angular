@@ -2,7 +2,6 @@ package com.gestion.controller;
 
 import com.gestion.dto.CategorieDTO;
 import com.gestion.entity.Categorie;
-import com.gestion.mapper.CategorieMapper;
 import com.gestion.service.CategorieService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,29 +31,37 @@ public class CategorieController {
     public ResponseEntity<List<CategorieDTO>> getAllCategories() {
         return ResponseEntity.ok(
                 categorieService.findAll().stream()
-                        .map(CategorieMapper::toDTO)
+                        .map(this::toDTO)
                         .toList()
         );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategorieDTO> getCategorie(@PathVariable Long id) {
-        return ResponseEntity.ok(CategorieMapper.toDTO(categorieService.findById(id)));
+        return ResponseEntity.ok(toDTO(categorieService.findById(id)));
     }
 
     @PostMapping
     public ResponseEntity<CategorieDTO> createCategorie(@RequestBody Categorie categorie) {
-        return ResponseEntity.ok(CategorieMapper.toDTO(categorieService.create(categorie)));
+        return ResponseEntity.ok(toDTO(categorieService.create(categorie)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CategorieDTO> updateCategorie(@PathVariable Long id, @RequestBody Categorie categorie) {
-        return ResponseEntity.ok(CategorieMapper.toDTO(categorieService.update(id, categorie)));
+        return ResponseEntity.ok(toDTO(categorieService.update(id, categorie)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategorie(@PathVariable Long id) {
         categorieService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private CategorieDTO toDTO(Categorie categorie) {
+        CategorieDTO dto = new CategorieDTO();
+        dto.setId(categorie.getId());
+        dto.setNom(categorie.getNom());
+        dto.setDescription(categorie.getDescription());
+        return dto;
     }
 }

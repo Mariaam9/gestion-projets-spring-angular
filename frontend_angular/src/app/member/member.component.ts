@@ -4,17 +4,17 @@ import { MatDialog } from '@angular/material/dialog';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { EmployeService } from '../../Services/employe.service';
+import { CategorieService } from '../../Services/categorie.service';
 import { AffectationService } from '../../Services/affectation.service';
 import { ConfirmComponent } from '../confirm/confirm.component';
 import { Employe } from '../../Modeles/Employe';
+import { Categorie } from '../../Modeles/Categorie';
 import { Affectation } from '../../Modeles/Affectation';
 
 type EmployeRow = Employe & {
   fullName: string;
   initial: string;
   categorieLabel: string;
-  telephoneLabel: string;
-  statutLabel: string;
   projetsCount: number;
 };
 
@@ -32,6 +32,7 @@ export class MemberComponent implements OnInit {
 
   constructor(
     private employeService: EmployeService,
+    private categorieService: CategorieService,
     private affectationService: AffectationService,
     private dialog: MatDialog,
     private router: Router
@@ -54,11 +55,14 @@ export class MemberComponent implements OnInit {
       ),
       affectations: this.affectationService.GetAllAffectations().pipe(
         catchError(() => of([] as Affectation[]))
+      ),
+      categories: this.categorieService.GetAllCategories().pipe(
+        catchError(() => of([] as Categorie[]))
       )
     })
       .pipe(finalize(() => (this.loading = false)))
-      .subscribe(({ employes, affectations }) => {
-        this.allEmployes = this.buildRows(employes || [], affectations || []);
+      .subscribe(({ employes, affectations, categories }) => {
+        this.allEmployes = this.buildRows(employes || [], affectations || [], categories || []);
         this.applyFilter();
       });
   }
@@ -78,9 +82,7 @@ export class MemberComponent implements OnInit {
         employe.fullName,
         employe.email,
         employe.matricule,
-        employe.categorieLabel,
-        employe.telephoneLabel,
-        employe.statutLabel
+        employe.categorieLabel
       ]
         .filter(Boolean)
         .join(' ')
@@ -116,15 +118,12 @@ export class MemberComponent implements OnInit {
     });
   }
 
-  isInactive(statut: string): boolean {
-    return (statut || '').toLowerCase().includes('inact');
-  }
 
   trackByEmployeId(_: number, employe: EmployeRow): number | undefined {
     return employe.id;
   }
 
-  private buildRows(employes: Employe[], affectations: Affectation[]): EmployeRow[] {
+  private buildRows(employes: Employe[], affectations: Affectation[], categories: Categorie[]): EmployeRow[] {
     const projetsParEmploye = new Map<number, Set<number>>();
 
     (affectations || []).forEach((affectation: any) => {
@@ -140,6 +139,14 @@ export class MemberComponent implements OnInit {
       projetsParEmploye.get(employeId)?.add(projetId);
     });
 
+    const categorieById = new Map<number, Categorie>();
+    (categories || []).forEach((categorie: any) => {
+      const categorieId = this.toNumber(categorie?.id ?? categorie?.categorieId ?? categorie?.idCategorie);
+      if (categorieId) {
+        categorieById.set(categorieId, categorie);
+      }
+    });
+
     return (employes || []).map((employe: any) => {
       const id = Number(employe.id);
       const nom = employe.nom || '';
@@ -153,14 +160,7 @@ export class MemberComponent implements OnInit {
         ...employe,
         fullName,
         initial: this.getInitial(prenom, nom, employe.email),
-        categorieLabel: employe.categorieNom || employe.categorie?.nom || '—',
-        telephoneLabel:
-          employe.telephone ||
-          employe.tel ||
-          employe.phone ||
-          employe.numeroTelephone ||
-          '—',
-        statutLabel: employe.statut || employe.status || 'Actif',
+        categorieLabel: this.resolveCategorieLabel(employe, categorieById),
         projetsCount:
           employe.nombreProjets ??
           employe.projetsCount ??
@@ -169,6 +169,38 @@ export class MemberComponent implements OnInit {
           projetsCountFromAffectations
       } as EmployeRow;
     });
+  }
+
+
+  private resolveCategorieLabel(employe: any, categorieById: Map<number, Categorie>): string {
+    const directLabel =
+      employe?.categorieNom ||
+      employe?.nomCategorie ||
+      employe?.categorie_name ||
+      employe?.categorie?.nom ||
+      employe?.categorie?.name;
+
+    if (directLabel) {
+      return String(directLabel);
+    }
+
+    const categorieId = this.toNumber(
+      employe?.categorieId ??
+      employe?.idCategorie ??
+      employe?.categorie_id ??
+      employe?.categorie?.id
+    );
+
+    if (categorieId && categorieById.has(categorieId)) {
+      return categorieById.get(categorieId)?.nom || '—';
+    }
+
+    return '—';
+  }
+
+  private toNumber(value: any): number {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
   }
 
   private getInitial(prenom?: string, nom?: string, email?: string): string {

@@ -2,7 +2,6 @@ package com.gestion.controller;
 
 import com.gestion.dto.ProjetDTO;
 import com.gestion.entity.Projet;
-import com.gestion.mapper.ProjetMapper;
 import com.gestion.service.ProjetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,29 +31,39 @@ public class ProjetController {
     public ResponseEntity<List<ProjetDTO>> getAllProjets() {
         return ResponseEntity.ok(
                 projetService.findAll().stream()
-                        .map(ProjetMapper::toDTO)
+                        .map(this::toDTO)
                         .toList()
         );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProjetDTO> getProjet(@PathVariable Long id) {
-        return ResponseEntity.ok(ProjetMapper.toDTO(projetService.findById(id)));
+        return ResponseEntity.ok(toDTO(projetService.findById(id)));
     }
 
     @PostMapping
     public ResponseEntity<ProjetDTO> createProjet(@RequestBody Projet projet) {
-        return ResponseEntity.ok(ProjetMapper.toDTO(projetService.create(projet)));
+        return ResponseEntity.ok(toDTO(projetService.create(projet)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ProjetDTO> updateProjet(@PathVariable Long id, @RequestBody Projet projet) {
-        return ResponseEntity.ok(ProjetMapper.toDTO(projetService.update(id, projet)));
+        return ResponseEntity.ok(toDTO(projetService.update(id, projet)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProjet(@PathVariable Long id) {
         projetService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private ProjetDTO toDTO(Projet projet) {
+        ProjetDTO dto = new ProjetDTO();
+        dto.setId(projet.getId());
+        dto.setNom(projet.getNom());
+        dto.setDescription(projet.getDescription());
+        dto.setDateDebut(projet.getDateDebut());
+        dto.setDateFin(projet.getDateFin());
+        return dto;
     }
 }

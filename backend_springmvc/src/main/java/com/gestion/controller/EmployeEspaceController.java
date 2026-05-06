@@ -4,8 +4,8 @@ import com.gestion.config.JwtUtil;
 import com.gestion.dto.AffectationDTO;
 import com.gestion.dto.EmployeResponseDTO;
 import com.gestion.dto.ProjetDTO;
-import com.gestion.mapper.EmployeMapper;
-import com.gestion.mapper.ProjetMapper;
+import com.gestion.entity.Employe;
+import com.gestion.entity.Projet;
 import com.gestion.service.AffectationService;
 import com.gestion.service.EmployeService;
 import com.gestion.service.ProjetService;
@@ -43,7 +43,7 @@ public class EmployeEspaceController {
     public ResponseEntity<List<ProjetDTO>> getAllProjets() {
         return ResponseEntity.ok(
                 projetService.findAll().stream()
-                        .map(ProjetMapper::toDTO)
+                        .map(this::toProjetDTO)
                         .toList()
         );
     }
@@ -62,11 +62,38 @@ public class EmployeEspaceController {
     @GetMapping("/profil")
     public ResponseEntity<EmployeResponseDTO> getProfil(@RequestHeader("Authorization") String authHeader) {
         Long userId = extractUserId(authHeader);
-        return ResponseEntity.ok(EmployeMapper.toResponseDTO(employeService.findById(userId)));
+        return ResponseEntity.ok(toEmployeResponseDTO(employeService.findById(userId)));
     }
 
     private Long extractUserId(String authHeader) {
         String token = authHeader.substring(7);
         return jwtUtil.extractUserId(token);
+    }
+
+    private ProjetDTO toProjetDTO(Projet projet) {
+        ProjetDTO dto = new ProjetDTO();
+        dto.setId(projet.getId());
+        dto.setNom(projet.getNom());
+        dto.setDescription(projet.getDescription());
+        dto.setDateDebut(projet.getDateDebut());
+        dto.setDateFin(projet.getDateFin());
+        return dto;
+    }
+
+    private EmployeResponseDTO toEmployeResponseDTO(Employe employe) {
+        EmployeResponseDTO dto = new EmployeResponseDTO();
+        dto.setId(employe.getId());
+        dto.setNom(employe.getNom());
+        dto.setPrenom(employe.getPrenom());
+        dto.setEmail(employe.getEmail());
+        dto.setRole(employe.getRole());
+        dto.setMatricule(employe.getMatricule());
+
+        if (employe.getCategorie() != null) {
+            dto.setCategorieId(employe.getCategorie().getId());
+            dto.setCategorieNom(employe.getCategorie().getNom());
+        }
+
+        return dto;
     }
 }

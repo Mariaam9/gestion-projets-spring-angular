@@ -2,7 +2,7 @@ package com.gestion.controller;
 
 import com.gestion.dto.EmployeDTO;
 import com.gestion.dto.EmployeResponseDTO;
-import com.gestion.mapper.EmployeMapper;
+import com.gestion.entity.Employe;
 import com.gestion.service.EmployeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,29 +32,46 @@ public class EmployeController {
     public ResponseEntity<List<EmployeResponseDTO>> getAllEmployes() {
         return ResponseEntity.ok(
                 employeService.findAll().stream()
-                        .map(EmployeMapper::toResponseDTO)
+                        .map(this::toResponseDTO)
                         .toList()
         );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EmployeResponseDTO> getEmploye(@PathVariable Long id) {
-        return ResponseEntity.ok(EmployeMapper.toResponseDTO(employeService.findById(id)));
+        return ResponseEntity.ok(toResponseDTO(employeService.findById(id)));
     }
 
     @PostMapping
     public ResponseEntity<EmployeResponseDTO> createEmploye(@RequestBody EmployeDTO dto) {
-        return ResponseEntity.ok(EmployeMapper.toResponseDTO(employeService.create(dto)));
+        return ResponseEntity.ok(toResponseDTO(employeService.create(dto)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<EmployeResponseDTO> updateEmploye(@PathVariable Long id, @RequestBody EmployeDTO dto) {
-        return ResponseEntity.ok(EmployeMapper.toResponseDTO(employeService.update(id, dto)));
+        return ResponseEntity.ok(toResponseDTO(employeService.update(id, dto)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmploye(@PathVariable Long id) {
         employeService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private EmployeResponseDTO toResponseDTO(Employe employe) {
+        EmployeResponseDTO dto = new EmployeResponseDTO();
+        dto.setId(employe.getId());
+        dto.setNom(employe.getNom());
+        dto.setPrenom(employe.getPrenom());
+        dto.setEmail(employe.getEmail());
+        dto.setRole(employe.getRole());
+        dto.setMatricule(employe.getMatricule());
+
+        if (employe.getCategorie() != null) {
+            dto.setCategorieId(employe.getCategorie().getId());
+            dto.setCategorieNom(employe.getCategorie().getNom());
+        }
+
+        return dto;
     }
 }
