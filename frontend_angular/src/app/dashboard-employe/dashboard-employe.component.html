@@ -23,11 +23,19 @@
     </div>
 
     <nav class="sidebar-nav" aria-label="Navigation employé">
-      <a class="nav-item active" routerLink="/dashboard-employe">
+      <a class="nav-item active" routerLink="/dashboard-employe" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
         <svg viewBox="0 0 24 24" width="21" height="21" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-9.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
         </svg>
         <span *ngIf="!isSidebarCollapsed">Mes Projets</span>
+      </a>
+
+      <a class="nav-item" routerLink="/profile-employe" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <svg viewBox="0 0 24 24" width="21" height="21" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M5 20c.8-4 3.1-6 7-6s6.2 2 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span *ngIf="!isSidebarCollapsed">Profile</span>
       </a>
     </nav>
 
@@ -68,6 +76,13 @@
                 <small>{{ getUserEmail() }}</small>
               </span>
             </div>
+            <button class="dropdown-item" type="button" (click)="goToProfile()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="2"/>
+                <path d="M5 20c.8-4 3.1-6 7-6s6.2 2 7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Profile
+            </button>
             <button class="dropdown-item logout" type="button" (click)="logout()">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
                 <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -227,6 +242,7 @@
               <span class="collaborator-avatar">{{ collaborateur.initials }}</span>
               <div>
                 <strong>{{ collaborateur.nomComplet }}</strong>
+                <p class="collaborator-email">{{ collaborateur.email || 'Email non disponible' }}</p>
                 <p>
                   Affecté du
                   {{ collaborateur.dateDebut ? (collaborateur.dateDebut | date:'dd/MM/yyyy') : '—' }}

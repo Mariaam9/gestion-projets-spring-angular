@@ -313,6 +313,11 @@ export class DashboardEmployeComponent implements OnInit {
     project.expanded = !project.expanded;
   }
 
+  goToProfile(): void {
+    this.isProfileMenuOpen = false;
+    this.router.navigate(['/profile-employe']);
+  }
+
   getUserFullName(): string {
     const user = this.profil || this.currentUser;
     const fullName = `${user?.prenom || ''} ${user?.nom || ''}`.trim();

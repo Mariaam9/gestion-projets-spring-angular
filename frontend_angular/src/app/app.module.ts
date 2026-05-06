@@ -27,6 +27,7 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { DashboardEmployeComponent } from './dashboard-employe/dashboard-employe.component';
+import { ProfileEmployeComponent } from './profile-employe/profile-employe.component';
 import { MemberComponent } from './member/member.component';
 import { MemberFormComponent } from './member-form/member-form.component';
 import { ProjetComponent } from './projet/projet.component';
@@ -45,6 +46,7 @@ import { JwtInterceptor } from '../Services/jwt.interceptor';
     LoginComponent,
     DashboardComponent,
     DashboardEmployeComponent,
+    ProfileEmployeComponent,
     MemberComponent,
     MemberFormComponent,
     ProjetComponent,

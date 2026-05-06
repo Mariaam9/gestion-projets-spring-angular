@@ -25,6 +25,6 @@ export class AppComponent implements OnInit {
   private updateLayoutFlags(url: string): void {
     const cleanUrl = (url || '').split('?')[0].split('#')[0];
     this.isLoginPage = cleanUrl.includes('/login');
-    this.isEmployeeDashboardPage = cleanUrl.includes('/dashboard-employe');
+    this.isEmployeeDashboardPage = cleanUrl.includes('/dashboard-employe') || cleanUrl.includes('/profile-employe');
   }
 }

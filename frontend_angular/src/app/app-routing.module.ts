@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { DashboardEmployeComponent } from './dashboard-employe/dashboard-employe.component';
+import { ProfileEmployeComponent } from './profile-employe/profile-employe.component';
 import { MemberComponent } from './member/member.component';
 import { MemberFormComponent } from './member-form/member-form.component';
 import { ProjetComponent } from './projet/projet.component';
@@ -36,6 +37,7 @@ const routes: Routes = [
   { path: 'affectations', redirectTo: 'projets', pathMatch: 'full' },
 
   { path: 'dashboard-employe', component: DashboardEmployeComponent, canActivate: [AuthGuard] },
+  { path: 'profile-employe', component: ProfileEmployeComponent, canActivate: [AuthGuard] },
 
   { path: '**', redirectTo: 'login' }
 ];
